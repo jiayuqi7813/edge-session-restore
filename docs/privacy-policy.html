@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Edge 会话恢复工具 - 隐私政策</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f4fbf8;
+        --panel: #ffffff;
+        --text: #173034;
+        --muted: #4f6b70;
+        --line: #d6e8e2;
+        --accent: #0d8b6f;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: linear-gradient(180deg, #eef9f5 0%, var(--bg) 100%);
+        color: var(--text);
+      }
+
+      main {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 48px 20px 72px;
+      }
+
+      article {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        padding: 32px;
+        box-shadow: 0 18px 48px rgba(16, 65, 57, 0.08);
+      }
+
+      h1, h2 {
+        line-height: 1.2;
+      }
+
+      h1 {
+        margin: 0 0 10px;
+        font-size: 34px;
+      }
+
+      h2 {
+        margin-top: 28px;
+        font-size: 22px;
+      }
+
+      p, li {
+        line-height: 1.75;
+        color: var(--text);
+      }
+
+      .meta {
+        margin: 0 0 24px;
+        color: var(--muted);
+      }
+
+      code {
+        padding: 0.15em 0.4em;
+        border-radius: 6px;
+        background: #edf7f3;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.92em;
+      }
+
+      a {
+        color: var(--accent);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <article>
+        <h1>隐私政策</h1>
+        <p class="meta">适用于“Edge 会话恢复工具”<br>最后更新日期：2026-04-09</p>
+
+        <p>本扩展仅用于在本地设备上保存和恢复 Microsoft Edge 会话状态，不提供账号系统，不要求登录，也不会把浏览数据上传到远端服务器。</p>
+
+        <h2>1. 我们处理哪些数据</h2>
+        <p>为了实现会话恢复功能，本扩展会在本地处理以下信息：</p>
+        <ul>
+          <li>标签页标题、URL、活动状态、固定状态和标签组信息。</li>
+          <li>窗口的位置、大小、焦点状态和窗口类型。</li>
+          <li>保存在浏览器本地存储中的快照、恢复事务、诊断状态和设置。</li>
+        </ul>
+
+        <h2>2. 这些数据如何被使用</h2>
+        <p>本扩展使用 <code>tabs</code>、<code>windows</code>、<code>tabGroups</code> 和 <code>storage</code> 权限，仅用于：</p>
+        <ul>
+          <li>保存当前浏览会话的本地快照。</li>
+          <li>在关闭最后一个普通窗口后保留最近一次可恢复状态。</li>
+          <li>恢复窗口、标签页和标签组布局。</li>
+          <li>在扩展弹窗中显示状态、计数和恢复结果。</li>
+        </ul>
+
+        <h2>3. 是否会上传或共享数据</h2>
+        <p>不会。本扩展不包含远端后端服务，不会把浏览记录、快照内容、诊断信息或任何恢复数据上传到第三方服务器，也不会与广告网络、分析平台或其他第三方共享这些数据。</p>
+
+        <h2>4. 账号、分析与追踪</h2>
+        <p>本扩展不提供账号系统，不要求登录，不使用广告标识符，不集成第三方分析 SDK，也不进行跨站追踪。</p>
+
+        <h2>5. 数据保留与删除</h2>
+        <p>相关数据仅保存在用户设备本地，直到以下情况之一发生：</p>
+        <ul>
+          <li>用户完成恢复流程。</li>
+          <li>用户选择忽略恢复。</li>
+          <li>用户卸载扩展或清除浏览器中的扩展数据。</li>
+        </ul>
+
+        <h2>6. 政策更新</h2>
+        <p>如果未来新增远端服务、账号系统或分析能力，本页面会同步更新。</p>
+
+        <h2>7. 联系方式</h2>
+        <p>如需进一步说明，请通过本扩展的 GitHub 仓库或发布页面联系维护者。</p>
+      </article>
+    </main>
+  </body>
+</html>
