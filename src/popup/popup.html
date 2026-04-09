@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Edge 会话恢复工具</title>
+    <link rel="stylesheet" href="./popup.css">
+  </head>
+  <body>
+    <main class="popup-shell">
+      <header class="popup-head">
+        <div class="title-group">
+          <div class="title">会话恢复</div>
+          <div class="subline" id="subline">正在读取状态</div>
+        </div>
+        <div class="toolbar-actions">
+          <div id="stateTag" class="state-tag">读取中</div>
+          <button id="refreshButton" class="icon-button" type="button" aria-label="刷新状态">刷新</button>
+        </div>
+      </header>
+
+      <section class="panel action-panel">
+        <div class="section-title">操作</div>
+        <p class="status-line" id="statusLine">请稍候，正在从后台读取恢复状态。</p>
+        <p class="status-copy" id="statusCopy">如果检测到你上次关闭前的窗口集合，这里会显示恢复入口。</p>
+        <div class="action-row">
+          <button id="primaryButton" class="button" type="button">恢复上次会话</button>
+          <button id="secondaryButton" class="button button-secondary" type="button">不恢复</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">会话概览</div>
+        <div class="row-list">
+          <div class="row-item">
+            <div class="row-label">窗口</div>
+            <div id="windowCount" class="row-value">0</div>
+          </div>
+          <div class="row-item">
+            <div class="row-label">标签</div>
+            <div id="tabCount" class="row-value">0</div>
+          </div>
+          <div class="row-item">
+            <div class="row-label">标签组</div>
+            <div id="groupCount" class="row-value">0</div>
+          </div>
+          <div class="row-item">
+            <div class="row-label">不可恢复</div>
+            <div id="unrecoverableCount" class="row-value">0</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">诊断</div>
+        <dl class="meta-list">
+          <div class="meta-row">
+            <dt>最近快照</dt>
+            <dd id="lastCapturedAt">暂无</dd>
+          </div>
+          <div class="meta-row">
+            <dt>最近错误</dt>
+            <dd id="lastError">无</dd>
+          </div>
+          <div class="meta-row">
+            <dt>恢复事务</dt>
+            <dd id="restoreTransaction">空闲</dd>
+          </div>
+        </dl>
+      </section>
+    </main>
+
+    <script type="module" src="./popup.js"></script>
+  </body>
+</html>
