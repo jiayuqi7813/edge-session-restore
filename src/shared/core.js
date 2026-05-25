@@ -125,6 +125,24 @@ export function detectWorkspaceMode(normalWindows) {
   return RESTORE_STATES.BLOCKED_BY_ACTIVE_WORKSPACE;
 }
 
+export function isBlankWorkspaceSnapshot(snapshot) {
+  return detectWorkspaceMode(snapshot?.windows) === RESTORE_STATES.BLANK_START_DETECTED;
+}
+
+export function shouldReplacePendingSnapshot(sourceSnapshot, pendingSnapshot) {
+  if (!sourceSnapshot?.windows?.length) {
+    return false;
+  }
+
+  if (!pendingSnapshot?.windows?.length) {
+    return true;
+  }
+
+  const sourceCapturedAt = Number.isFinite(sourceSnapshot.capturedAt) ? sourceSnapshot.capturedAt : 0;
+  const pendingCapturedAt = Number.isFinite(pendingSnapshot.capturedAt) ? pendingSnapshot.capturedAt : 0;
+  return sourceCapturedAt > pendingCapturedAt;
+}
+
 export function makeStatusPayload({
   pendingRestore = null,
   lastWindowClosingSnapshot = null,
@@ -134,6 +152,14 @@ export function makeStatusPayload({
 } = {}) {
   const hasPending = Boolean(pendingRestore?.active && lastWindowClosingSnapshot);
   const summary = lastWindowClosingSnapshot?.summary || null;
+  const snapshotMeta = lastWindowClosingSnapshot
+    ? {
+        snapshotId: lastWindowClosingSnapshot.snapshotId || null,
+        schemaVersion: lastWindowClosingSnapshot.schemaVersion || null,
+        captureReason: lastWindowClosingSnapshot.captureReason || null,
+        capturedAt: lastWindowClosingSnapshot.capturedAt || null
+      }
+    : null;
   let state = RESTORE_STATES.IDLE;
 
   if (restoreTransaction) {
@@ -154,6 +180,7 @@ export function makeStatusPayload({
     ok: true,
     state,
     summary,
+    snapshotMeta,
     pendingRestore,
     diagnostics,
     restoreTransaction,

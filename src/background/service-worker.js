@@ -3,9 +3,11 @@ import {
   createId,
   createSnapshot,
   detectWorkspaceMode,
+  isBlankWorkspaceSnapshot,
   isRecoverableUrl,
   isRestrictedUrl,
   makeStatusPayload,
+  shouldReplacePendingSnapshot,
   snapshotForBackup,
   validateSnapshot
 } from "../shared/core.js";
@@ -206,8 +208,7 @@ async function persistSnapshotState(triggerName) {
   const snapshot = await buildCurrentSnapshot(CAPTURE_REASONS.STEADY_STATE);
 
   if (snapshot.windows.length > 0) {
-    const previousWindowCount = state.latestStableSnapshot?.summary?.windowCount || 0;
-    if (snapshot.windows.length < previousWindowCount) {
+    if (isBlankWorkspaceSnapshot(snapshot)) {
       return;
     }
 
@@ -225,11 +226,15 @@ async function persistSnapshotState(triggerName) {
     return;
   }
 
-  if (state.pendingRestore?.active && !state.pendingRestore?.dismissedAt) {
+  const sourceSnapshot = state.latestStableSnapshot;
+  const shouldKeepPending =
+    state.pendingRestore?.active &&
+    !state.pendingRestore?.dismissedAt &&
+    !shouldReplacePendingSnapshot(sourceSnapshot, state.lastWindowClosingSnapshot);
+  if (shouldKeepPending) {
     return;
   }
 
-  const sourceSnapshot = state.latestStableSnapshot;
   if (!sourceSnapshot?.windows?.length) {
     return;
   }
@@ -288,7 +293,11 @@ async function promoteSnapshotToPending(sourceSnapshot, triggerName) {
 
 async function maybePersistLastWindowClose(triggerName) {
   const state = await getState();
-  if (state.pendingRestore?.active && !state.pendingRestore?.dismissedAt) {
+  const shouldKeepPending =
+    state.pendingRestore?.active &&
+    !state.pendingRestore?.dismissedAt &&
+    !shouldReplacePendingSnapshot(state.latestStableSnapshot, state.lastWindowClosingSnapshot);
+  if (shouldKeepPending) {
     return;
   }
 

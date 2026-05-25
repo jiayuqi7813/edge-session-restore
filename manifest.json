@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Edge 会话恢复工具",
   "description": "在 macOS 上关闭最后一个 Edge 窗口后，恢复上次可恢复的会话。",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "minimum_chrome_version": "120",
   "icons": {
     "16": "icons/icon-16.png",

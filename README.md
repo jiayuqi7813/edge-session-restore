@@ -39,7 +39,7 @@ bash scripts/package-extension.sh
 
 ```bash
 mkdir -p dist
-zip -r "dist/edge-session-restore-v1.0.0.zip" manifest.json src icons README.md docs
+zip -r "dist/edge-session-restore-v1.0.1.zip" manifest.json src icons README.md docs
 ```
 
 这个 zip 就是后续上传到 Microsoft Edge Add-ons 的提交包。

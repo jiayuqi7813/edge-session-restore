@@ -14,11 +14,48 @@ const unrecoverableCount = document.querySelector("#unrecoverableCount");
 const lastCapturedAt = document.querySelector("#lastCapturedAt");
 const lastError = document.querySelector("#lastError");
 const restoreTransaction = document.querySelector("#restoreTransaction");
+const debugState = document.querySelector("#debugState");
+const snapshotId = document.querySelector("#snapshotId");
+const captureReason = document.querySelector("#captureReason");
+const lastTrigger = document.querySelector("#lastTrigger");
+const pendingState = document.querySelector("#pendingState");
+const copyDebugButton = document.querySelector("#copyDebugButton");
+const copyDebugStatus = document.querySelector("#copyDebugStatus");
+const debugJson = document.querySelector("#debugJson");
 
 let currentPayload = null;
 let busy = false;
 
+function hasExtensionRuntime() {
+  return typeof chrome !== "undefined" && Boolean(chrome.runtime?.sendMessage);
+}
+
+function createPreviewPayload() {
+  return {
+    ok: true,
+    state: RESTORE_STATES.IDLE,
+    summary: null,
+    snapshotMeta: null,
+    pendingRestore: null,
+    diagnostics: {
+      lastSnapshotAt: null,
+      lastRestoreStartedAt: null,
+      lastRestoreFinishedAt: null,
+      lastErrorCode: "extension_api_unavailable",
+      lastErrorStage: "popup_preview",
+      lastCreatedWindowCount: 0,
+      lastCreatedTabCount: 0
+    },
+    restoreTransaction: null,
+    lastCapturedAt: null
+  };
+}
+
 async function sendMessage(type, payload = {}) {
+  if (!hasExtensionRuntime()) {
+    return createPreviewPayload();
+  }
+
   return chrome.runtime.sendMessage({
     type,
     ...payload
@@ -34,6 +71,31 @@ function formatTime(timestamp) {
     dateStyle: "short",
     timeStyle: "short"
   }).format(new Date(timestamp));
+}
+
+function shortId(value) {
+  if (!value) {
+    return "无";
+  }
+
+  const text = String(value);
+  if (text.length <= 22) {
+    return text;
+  }
+
+  return `${text.slice(0, 13)}...${text.slice(-6)}`;
+}
+
+function formatPendingState(pendingRestore) {
+  if (!pendingRestore) {
+    return "无";
+  }
+
+  if (!pendingRestore.active) {
+    return "inactive";
+  }
+
+  return pendingRestore.dismissedAt ? "dismissed" : "active";
 }
 
 function setCounts(summary) {
@@ -57,6 +119,13 @@ function setMeta(payload) {
   restoreTransaction.textContent = payload.restoreTransaction
     ? `${payload.restoreTransaction.stage || "running"} / ${formatTime(payload.restoreTransaction.startedAt)}`
     : "空闲";
+
+  debugState.textContent = payload.state || "unknown";
+  snapshotId.textContent = shortId(payload.snapshotMeta?.snapshotId);
+  snapshotId.title = payload.snapshotMeta?.snapshotId || "";
+  captureReason.textContent = payload.snapshotMeta?.captureReason || "无";
+  lastTrigger.textContent = payload.pendingRestore?.lastTrigger || "无";
+  pendingState.textContent = `${formatPendingState(payload.pendingRestore)} / ${formatTime(payload.pendingRestore?.createdAt)}`;
 }
 
 function setTag(text, tone = "neutral") {
@@ -74,6 +143,9 @@ function setButtons({ primaryText, secondaryText, showSecondary, primaryDisabled
 
 function renderState(payload) {
   currentPayload = payload;
+  copyDebugStatus.textContent = "";
+  debugJson.hidden = true;
+  debugJson.value = JSON.stringify(buildDebugPayload(payload), null, 2);
   setCounts(payload.summary);
   setMeta(payload);
 
@@ -173,6 +245,68 @@ function renderState(payload) {
   }
 }
 
+function buildDebugPayload(payload) {
+  return {
+    state: payload?.state || null,
+    summary: payload?.summary || null,
+    snapshotMeta: payload?.snapshotMeta || null,
+    pendingRestore: payload?.pendingRestore || null,
+    diagnostics: payload?.diagnostics || null,
+    restoreTransaction: payload?.restoreTransaction || null,
+    lastCapturedAt: payload?.lastCapturedAt || null,
+    copiedAt: new Date().toISOString()
+  };
+}
+
+async function writeClipboardText(text) {
+  if (navigator.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return;
+    } catch {
+      // Fall through to the textarea copy path for local previews.
+    }
+  }
+
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "fixed";
+  textarea.style.top = "-1000px";
+  document.body.append(textarea);
+  textarea.focus();
+  textarea.select();
+  textarea.setSelectionRange(0, textarea.value.length);
+  const copied = document.execCommand("copy");
+  textarea.remove();
+  if (!copied) {
+    throw new Error("copy_command_failed");
+  }
+}
+
+async function copyDebugInfo() {
+  if (!currentPayload) {
+    copyDebugStatus.textContent = "暂无可复制内容";
+    return;
+  }
+
+  copyDebugButton.disabled = true;
+  try {
+    const text = JSON.stringify(buildDebugPayload(currentPayload), null, 2);
+    debugJson.value = text;
+    await writeClipboardText(text);
+    copyDebugStatus.textContent = "已复制调试信息";
+    debugJson.hidden = true;
+  } catch (error) {
+    debugJson.hidden = false;
+    debugJson.focus();
+    debugJson.select();
+    copyDebugStatus.textContent = "复制受限，JSON 已展开";
+  } finally {
+    copyDebugButton.disabled = false;
+  }
+}
+
 async function refreshStatus() {
   if (busy) {
     return;
@@ -236,6 +370,7 @@ async function performSecondaryAction() {
 primaryButton.addEventListener("click", performPrimaryAction);
 secondaryButton.addEventListener("click", performSecondaryAction);
 refreshButton.addEventListener("click", refreshStatus);
+copyDebugButton.addEventListener("click", copyDebugInfo);
 window.addEventListener("focus", refreshStatus);
 
 refreshStatus();

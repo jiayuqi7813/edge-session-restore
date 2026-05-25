@@ -52,7 +52,10 @@
       </section>
 
       <section class="panel">
-        <div class="section-title">诊断</div>
+        <div class="panel-title-row">
+          <div class="section-title">诊断</div>
+          <button id="copyDebugButton" class="mini-button" type="button">复制</button>
+        </div>
         <dl class="meta-list">
           <div class="meta-row">
             <dt>最近快照</dt>
@@ -66,7 +69,29 @@
             <dt>恢复事务</dt>
             <dd id="restoreTransaction">空闲</dd>
           </div>
+          <div class="meta-row">
+            <dt>状态码</dt>
+            <dd id="debugState">idle</dd>
+          </div>
+          <div class="meta-row">
+            <dt>快照ID</dt>
+            <dd id="snapshotId">无</dd>
+          </div>
+          <div class="meta-row">
+            <dt>捕获原因</dt>
+            <dd id="captureReason">无</dd>
+          </div>
+          <div class="meta-row">
+            <dt>最近触发</dt>
+            <dd id="lastTrigger">无</dd>
+          </div>
+          <div class="meta-row">
+            <dt>Pending</dt>
+            <dd id="pendingState">无</dd>
+          </div>
         </dl>
+        <div id="copyDebugStatus" class="copy-status" role="status"></div>
+        <textarea id="debugJson" class="debug-json" aria-label="调试 JSON" readonly hidden></textarea>
       </section>
     </main>
 
